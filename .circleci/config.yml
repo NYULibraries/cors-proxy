@@ -146,26 +146,26 @@ workflows:
           filters:
             branches:
               ignore: master
-          requires:
-            - test
+          # requires:
+          #   - test
       - deploy-staging-awsprod:
           context: web-lambdas-aws-nyulits
           filters:
             branches:
               ignore: master
-          requires:
-            - test
+          # requires:
+          #   - test
       - deploy-production-awsdev:
           context: web-lambdas-aws-nyulitsdev
           filters:
             branches:
               only: master
-          requires:
-            - test
+          # requires:
+          #   - test
       - deploy-production-awsprod:
           context: web-lambdas-aws-nyulits
           filters:
             branches:
               only: master
-          requires:
-            - test
+          # requires:
+          #   - test
