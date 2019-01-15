@@ -140,7 +140,7 @@ workflows:
   version: 2
   build-test-and-deploy:
     jobs:
-      - test
+      # - test
       - deploy-staging-awsdev:
           context: web-lambdas-aws-nyulitsdev
           filters:
