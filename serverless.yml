@@ -12,6 +12,8 @@ provider:
     # Resource ids for rest api, so serverless deploys to this static resource vs. creating its own
     restApiId: ${env:REST_API_ID}
     restApiRootResourceId: ${env:REST_API_ROOT_RESOURCE_ID}
+  environment:
+    ALLOW_ORIGIN: 'https://*.library.nyu.edu'
 
 package:
   include:
