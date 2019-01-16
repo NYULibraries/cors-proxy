@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  # coverage:
+  #   image: cors-proxy
+  #   build:
+  #     context: .
+  #     cache_from:
+  #       - cors-proxy
+  #       - $IMAGES_DOMAIN/cors-proxy
+  #   command: yarn test-and-report
+  #   environment:
+  #     COVERALLS_REPO_TOKEN:
+  deploy:
+    image: cors-proxy
+    build:
+      context: .
+      cache_from:
+        - cors-proxy
+        - $IMAGES_DOMAIN/cors-proxy
+    command: yarn deploy --stage=${STAGE} --region=${REGION}
+    environment:
+      LAMBDA_ROLE:
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+      REGION:
+      STAGE:
+      REST_API_ID:
+      REST_API_ROOT_RESOURCE_ID:
+      REST_API_NAMESPACE_RESOURCE_ID:
+      S3_BUCKET:
+      # CORS-PROXY SECRETS/CONFIG VALUES
