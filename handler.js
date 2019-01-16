@@ -4,16 +4,14 @@ const axios = require('axios');
 const { ALLOW_ORIGIN } = process.env;
 
 module.exports['cors-proxy'] = async (event, context) => {
-  console.log(event);
-
-  const wildcardMatch = (str, rule) => new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
-
-  const allowOrigin = wildcardMatch(event.headers.Origin, ALLOW_ORIGIN) ? event.headers.Origin : 'null';
 
   try {
     const { url } = event.queryStringParameters;
     const response = await axios({ method: 'get', url: decodeURIComponent(url) });
 
+    const origin = event.headers.origin;
+    const wildcardMatch = (str, rule) => new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
+    const allowOrigin = wildcardMatch(origin, ALLOW_ORIGIN) ? origin : 'null';
     return {
       statusCode: 200,
       body: response.data,
@@ -30,7 +28,7 @@ module.exports['cors-proxy'] = async (event, context) => {
       statusCode: 422,
       body: JSON.stringify({
         event: event,
-        errorMessage: err
+        errorDetails: err
       })
     };
   }
