@@ -4,17 +4,15 @@ const axios = require('axios');
 const { ALLOW_ORIGIN } = process.env;
 
 module.exports['cors-proxy'] = async (event, context) => {
+  console.log(event);
 
-  function wildcardMatch(str, rule) {
-    return new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
-  }
+  const wildcardMatch = (str, rule) => new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
 
   const allowOrigin = wildcardMatch(event.headers.Origin, ALLOW_ORIGIN) ? event.headers.Origin : 'null';
 
-  let response;
   try {
     const { url } = event.queryStringParameters;
-    response = await axios({ method: 'get', url });
+    const response = await axios({ method: 'get', url: decodeURIComponent(url) });
 
     return {
       statusCode: 200,
@@ -31,8 +29,8 @@ module.exports['cors-proxy'] = async (event, context) => {
     return {
       statusCode: 422,
       body: JSON.stringify({
-        message: `Invalid input. Request expects a 'url' parameter`,
         event: event,
+        errorMessage: err
       })
     };
   }
