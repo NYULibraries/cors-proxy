@@ -9,7 +9,7 @@ module.exports['cors-proxy'] = async (event, context) => {
     return new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
   }
 
-  const allowOrigin = wildcardMatch(event.headers.Origin, ALLOW_ORIGIN) ? event.headers.Origin : null;
+  const allowOrigin = wildcardMatch(event.headers.Origin, ALLOW_ORIGIN) ? event.headers.Origin : 'null';
 
   let response;
   try {
