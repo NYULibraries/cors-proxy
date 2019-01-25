@@ -5,19 +5,19 @@ Produces an `"Access-Control-Allow-Origin"` header specific to your server with 
 
 # Configure
 
-Simply configure allowed  via the environment. '*' is used as a wildcard.
+Simply configure allowed  via the environment. '*' is used as a wildcard. Uses a comma separted list for multiple urls.
 
 `serverless.yml`
 ```yml
   environment:
-    ALLOW_ORIGIN: https://*library.nyu.edu
+    ALLOW_ORIGINS: https://*.library.nyu.edu,https://library.nyu.edu
 ```
 
 For our purposes, the url is checked in to our repository; for those interested in forking, you can also refer to an environment variable which is referenced at the time of build and deploy.
 
 ```yml
 environment:
-  ALLOW_ORIGIN: ${env:ALLOW_ORIGIN}
+  ALLOW_ORIGINS: ${env:ALLOW_ORIGINS}
 ```
 
 Thanks:

@@ -1,7 +1,7 @@
 'use strict';
 
 const axios = require('axios');
-const { ALLOW_ORIGIN } = process.env;
+const { ALLOW_ORIGINS } = process.env;
 
 module.exports['cors-proxy'] = async (event, context) => {
 
@@ -11,7 +11,7 @@ module.exports['cors-proxy'] = async (event, context) => {
 
     const origin = event.headers.origin;
     const wildcardMatch = (str, rule) => new RegExp("^" + rule.split("*").join(".*") + "$").test(str);
-    const allowOrigin = wildcardMatch(origin, ALLOW_ORIGIN) ? origin : 'null';
+    const allowOrigin = ALLOW_ORIGINS.split(',').some(allowedOrigin => wildcardMatch(origin, allowedOrigin)) ? origin : 'null';
     return {
       statusCode: 200,
       body: response.data,
