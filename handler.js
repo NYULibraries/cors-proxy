@@ -1,14 +1,15 @@
 'use strict';
 
 const axios = require('axios');
-const { allowOriginFilter } = require('./lib/utils');
-const { ALLOW_ORIGINS } = process.env;
+const allowOriginFilter = require('./lib/utils').allowOriginFilter;
 
-module.exports['cors-proxy'] = async (event, context) => {
+module.exports.corsProxy = async (event, context) => {
+  const { ALLOW_ORIGINS } = process.env;
+
   try {
     // assigns url, origin from event body
     const { queryStringParameters: { url }, headers: { origin } } = event;
-    const response = await axios({ method: 'get', url: decodeURIComponent(url) });
+    const response = await axios.get({ url: decodeURIComponent(url) });
     const allowedOrigins = ALLOW_ORIGINS.split(',');
 
     return {
