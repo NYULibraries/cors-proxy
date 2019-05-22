@@ -13,7 +13,7 @@ provider:
     restApiId: ${env:REST_API_ID}
     restApiRootResourceId: ${env:REST_API_ROOT_RESOURCE_ID}
   environment:
-    ALLOW_ORIGINS: http*://*library.nyu.edu,http*://a69099693049411e99b020ab788a14b0-1952357591.us-east-1.elb.amazonaws.com
+    ALLOW_ORIGINS: http*://*library.nyu.edu
 
 package:
   include:
@@ -31,5 +31,5 @@ functions:
       - http:
           method: get
           path: cors-proxy
-    handler: handler.cors-proxy
+    handler: handler.corsProxy
     memorySize: 128
