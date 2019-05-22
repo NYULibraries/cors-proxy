@@ -9,7 +9,7 @@ module.exports.corsProxy = async (event, context) => {
   try {
     // assigns url, origin from event body
     const { queryStringParameters: { url }, headers: { origin } } = event;
-    const response = await axios.get({ url: decodeURIComponent(url) });
+    const response = await axios.get(decodeURIComponent(url));
     const allowedOrigins = ALLOW_ORIGINS.split(',');
 
     return {
