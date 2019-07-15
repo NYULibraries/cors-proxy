@@ -32,4 +32,4 @@ functions:
           method: get
           path: cors-proxy
     handler: handler.corsProxy
-    memorySize: 128
+    memorySize: 1024
