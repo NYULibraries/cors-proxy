@@ -1,4 +1,4 @@
-FROM node:8.10-alpine
+FROM node:10-alpine
 
 ENV INSTALL_PATH /app
 

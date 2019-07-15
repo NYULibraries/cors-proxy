@@ -35,7 +35,7 @@
     "axios": "^0.18.0"
   },
   "engines": {
-    "node": "^8.10"
+    "node": "^10"
   },
   "optionalDependencies": {
     "eslint": "^5.16.0"
