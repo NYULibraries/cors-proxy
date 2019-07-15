@@ -1,4 +1,8 @@
 # cors-proxy
+
+[![Docker Repository on Quay](https://quay.io/repository/nyulibraries/cors-proxy/status "Docker Repository on Quay")](https://quay.io/repository/nyulibraries/cors-proxy)
+[![CircleCI](https://circleci.com/gh/NYULibraries/cors-proxy.svg?style=svg)](https://circleci.com/gh/NYULibraries/cors-proxy)
+
 CORS proxy with AWS Lambda.
 
 Produces an `"Access-Control-Allow-Origin"` header specific to your server with some basic configuration.
