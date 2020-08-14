@@ -4,6 +4,7 @@ const axios = require('axios');
 const allowOriginFilter = require('./lib/utils').allowOriginFilter;
 
 module.exports.corsProxy = async (event, context) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   const { ALLOW_ORIGINS } = process.env;
 
   try {
