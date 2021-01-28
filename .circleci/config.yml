@@ -204,7 +204,7 @@ workflows:
             branches:
               ignore: master
           requires:
-            - build-lambda-dev
+            - build-lambda
       - deploy-staging-awsdev:
           context: web-lambdas-aws-nyulitsdev
           filters:
