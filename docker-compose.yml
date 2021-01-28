@@ -53,7 +53,7 @@ services:
     environment:
       <<: *x-deploy-environment
       TF_VAR_lambda_function_name: cors-proxy
-      TF_VAR_lambda_handler: handler.persistent
+      TF_VAR_lambda_handler: handler.corsProxy
       TF_VAR_lambda_runtime: nodejs12.x
       TF_VAR_lambda_method: GET
       TF_VAR_lambda_memory_limit: 1024
