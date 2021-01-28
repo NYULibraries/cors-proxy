@@ -1,7 +1,7 @@
 # Aliases
 docker-defaults: &docker-defaults
   docker:
-    - image: quay.io/nyulibraries/circleci_docker:18.06.3-dc-1.23.2-0
+    - image: quay.io/nyulibraries/circleci_docker:19.03.13-dc-1.27.4-0
   working_directory: ~/app
 
 auth_quay: &auth_quay
@@ -71,8 +71,58 @@ aws-deploy: &aws-deploy
     name: Deploy via serverless to AWS account
     command: docker-compose run deploy
 
+s3_deploy: &s3_deploy
+  aws-s3/sync:
+    from: dist
+    to: 's3://${TF_VAR_lambda_s3_bucket}/cors-proxy/${CIRCLE_SHA1}'
+    arguments: |
+      --exclude "*" \
+      --include "cors-proxy.zip" \
+      --delete
+    overwrite: true
+
+zip: &zip
+  run:
+    name: Zip Lambda files
+    command: docker-compose run build_lambda
+
+get_lambda_zip: &get_lambda_zip
+  run:
+    name: Retrieve zipped lambda from container
+    command: |
+      docker cp $(docker ps -aq --filter 'label=nyulibraries.app=cors-proxy'):/app/dist .
+
+terraform_deploy: &terraform_deploy
+  run:
+    name: Deploy the Lambda to AWS via Terraform
+    command: |
+      apk add gettext
+      export TF_VAR_lambda_version=${CIRCLE_SHA1}
+      export TF_VAR_environment_variables=$(envsubst < .tf_env_vars)
+      docker-compose run terraform_deploy
+
 version: 2
 jobs:
+  build-lambda:
+    <<: *docker-defaults
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+      - <<: *build
+      - <<: *zip
+      - <<: *get_lambda_zip
+      - <<: *s3_deploy
+
+  deploy-lambda:
+    <<: *docker-defaults
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+      - <<: *auth_quay
+      - <<: *terraform_deploy
+
   deploy-staging-awsdev:
     <<: *docker-defaults
     steps:
@@ -141,6 +191,20 @@ workflows:
   build-test-and-deploy:
     jobs:
       - test
+      - build-lambda:
+          context: web-lambdas-api-gateway-dev
+          filters:
+            branches:
+              ignore: master
+          requires:
+            - test
+      - deploy-lambda:
+          context: web-lambdas-api-gateway-dev
+          filters:
+            branches:
+              ignore: master
+          requires:
+            - build-lambda-dev
       - deploy-staging-awsdev:
           context: web-lambdas-aws-nyulitsdev
           filters:
