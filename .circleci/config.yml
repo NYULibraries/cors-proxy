@@ -101,7 +101,7 @@ terraform_deploy: &terraform_deploy
       export TF_VAR_environment_variables=$(envsubst < .tf_env_vars)
       docker-compose run terraform_deploy
 
-version: 2
+version: 2.1
 jobs:
   build-lambda:
     <<: *docker-defaults
