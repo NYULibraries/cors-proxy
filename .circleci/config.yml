@@ -102,6 +102,8 @@ terraform_deploy: &terraform_deploy
       docker-compose run terraform_deploy
 
 version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@1.0.11
 jobs:
   build-lambda:
     <<: *docker-defaults
