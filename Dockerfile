@@ -1,5 +1,7 @@
 FROM node:10-alpine
 
+RUN apk --update --no-cache add zip
+
 ENV INSTALL_PATH /app
 
 WORKDIR $INSTALL_PATH
