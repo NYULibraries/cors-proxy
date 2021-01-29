@@ -47,7 +47,7 @@ services:
       # CORS-PROXY SECRETS/CONFIG VALUES
 
   terraform_deploy:
-    image: quay.io/nyulibraries/web-lambdas-terraform:chore_remove_deployment
+    image: quay.io/nyulibraries/web-lambdas-terraform:master
     command: ["terraform", "apply", "-auto-approve"]
     # env_file: dev.env
     environment:
