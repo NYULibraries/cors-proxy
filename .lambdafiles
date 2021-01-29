@@ -1,4 +1,4 @@
-common/
+lib/
 config/
 node_modules/
 handler.js
