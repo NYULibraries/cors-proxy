@@ -111,6 +111,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 19.03.13
+      - <<: *auth_quay
       - <<: *build
       - <<: *zip
       - <<: *get_lambda_zip
