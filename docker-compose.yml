@@ -52,6 +52,7 @@ services:
     build:
       context: deploy/
     command: ["terraform", "apply", "-auto-approve"]
+    # env_file: dev.env
     environment:
       <<: *x-deploy-environment
       BACKEND_KEY: lambdas/tf_state/cors-proxy
