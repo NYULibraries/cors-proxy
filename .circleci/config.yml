@@ -209,7 +209,7 @@ workflows:
             branches:
               ignore: master
           requires:
-            - build-lambda
+            - build-lambda-dev
       - build-lambda:
           name: build-lambda-prod
           context: web-lambdas-api-gateway-prod
