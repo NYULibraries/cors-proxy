@@ -182,7 +182,8 @@ jobs:
     <<: *docker-defaults
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - <<: *auth_quay
       - <<: *pull
       - <<: *build
@@ -208,13 +209,13 @@ workflows:
               ignore: master
           requires:
             - build-lambda
-      - deploy-staging-awsdev:
-          context: web-lambdas-aws-nyulitsdev
-          filters:
-            branches:
-              ignore: master
-          requires:
-            - test
+      # - deploy-staging-awsdev:
+      #     context: web-lambdas-aws-nyulitsdev
+      #     filters:
+      #       branches:
+      #         ignore: master
+      #     requires:
+      #       - test
       - deploy-staging-awsprod:
           context: web-lambdas-aws-nyulits
           filters:
@@ -222,13 +223,13 @@ workflows:
               ignore: master
           requires:
             - test
-      - deploy-production-awsdev:
-          context: web-lambdas-aws-nyulitsdev
-          filters:
-            branches:
-              only: master
-          requires:
-            - test
+      # - deploy-production-awsdev:
+      #     context: web-lambdas-aws-nyulitsdev
+      #     filters:
+      #       branches:
+      #         only: master
+      #     requires:
+      #       - test
       - deploy-production-awsprod:
           context: web-lambdas-aws-nyulits
           filters:
