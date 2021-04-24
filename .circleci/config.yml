@@ -201,20 +201,15 @@ workflows:
           requires:
             - test
       - deploy-lambda:
+          name: deploy-lambda-dev
           context: web-lambdas-api-gateway-dev
           filters:
             branches:
               ignore: master
           requires:
             - build-lambda
-      - build-lambda:
-          context: web-lambdas-api-gateway-prod
-          filters:
-            branches:
-              only: chore/tf_lambda
-          requires:
-            - test
       - deploy-lambda:
+          name: deploy-lambda-prod
           context: web-lambdas-api-gateway-prod
           filters:
             branches:
