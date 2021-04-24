@@ -111,7 +111,6 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 19.03.13
-      - <<: *auth_quay
       - <<: *build
       - <<: *zip
       - <<: *get_lambda_zip
@@ -123,7 +122,6 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 19.03.13
-      - <<: *auth_quay
       - <<: *terraform_deploy
 
   deploy-staging-awsdev:
@@ -207,6 +205,20 @@ workflows:
           filters:
             branches:
               ignore: master
+          requires:
+            - build-lambda
+      - build-lambda:
+          context: web-lambdas-api-gateway-prod
+          filters:
+            branches:
+              only: chore/tf_lambda
+          requires:
+            - test
+      - deploy-lambda:
+          context: web-lambdas-api-gateway-prod
+          filters:
+            branches:
+              only: chore/tf_lambda
           requires:
             - build-lambda
       # - deploy-staging-awsdev:
