@@ -215,7 +215,7 @@ workflows:
           context: web-lambdas-api-gateway-prod
           filters:
             branches:
-              ignore: master
+              only: master
           requires:
             - test
       - deploy-lambda:
