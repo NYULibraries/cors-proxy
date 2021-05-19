@@ -1,7 +1,7 @@
 # Aliases
 docker-defaults: &docker-defaults
   docker:
-    - image: quay.io/nyulibraries/circleci_docker:18.06.3-dc-1.23.2-0
+    - image: quay.io/nyulibraries/circleci_docker:19.03.13-dc-1.27.4-0
   working_directory: ~/app
 
 auth_quay: &auth_quay
@@ -29,25 +29,25 @@ test: &test
     name: Test
     command: docker-compose run coverage
 
-check-awsdev-not-disabled: &check-awsdev-not-disabled
-  run:
-    name: Check if development deploy is disabled
-    command: |
-      if [ $DISABLE_AWSDEV == true ]
-      then
-        echo "Deployment to AWS development account has been disabled with the current environment configuration (DISABLE_AWSDEV == true)"
-        circleci step halt
-      fi
+# check-awsdev-not-disabled: &check-awsdev-not-disabled
+#   run:
+#     name: Check if development deploy is disabled
+#     command: |
+#       if [ $DISABLE_AWSDEV == true ]
+#       then
+#         echo "Deployment to AWS development account has been disabled with the current environment configuration (DISABLE_AWSDEV == true)"
+#         circleci step halt
+#       fi
 
-check-awsprod-not-disabled: &check-awsprod-not-disabled
-  run:
-    name: Check if production deploy is disabled
-    command: |
-      if [ $DISABLE_AWSPROD == true ]
-      then
-        echo "Deployment to AWS development account has been disabled with the current environment configuration (DISABLE_AWSPROD == true)"
-        circleci step halt
-      fi
+# check-awsprod-not-disabled: &check-awsprod-not-disabled
+#   run:
+#     name: Check if production deploy is disabled
+#     command: |
+#       if [ $DISABLE_AWSPROD == true ]
+#       then
+#         echo "Deployment to AWS development account has been disabled with the current environment configuration (DISABLE_AWSPROD == true)"
+#         circleci step halt
+#       fi
 
 set-env-stage-dev: &set-env-stage-dev
   run:
@@ -56,7 +56,6 @@ set-env-stage-dev: &set-env-stage-dev
       echo 'export STAGE="dev"' >> $BASH_ENV
       echo 'export REST_API_ID="$REST_API_ID_DEV"' >> $BASH_ENV
       echo 'export REST_API_ROOT_RESOURCE_ID="$REST_API_ROOT_RESOURCE_ID_DEV"' >> $BASH_ENV
-
 
 set-env-stage-prod: &set-env-stage-prod
   run:
@@ -71,27 +70,79 @@ aws-deploy: &aws-deploy
     name: Deploy via serverless to AWS account
     command: docker-compose run deploy
 
-version: 2
+s3_deploy: &s3_deploy
+  aws-s3/sync:
+    from: dist
+    to: 's3://${TF_VAR_lambda_s3_bucket}/cors-proxy/${CIRCLE_SHA1}'
+    arguments: |
+      --exclude "*" \
+      --include "cors-proxy.zip" \
+      --delete
+    overwrite: true
+
+zip: &zip
+  run:
+    name: Zip Lambda files
+    command: docker-compose run build_lambda
+
+get_lambda_zip: &get_lambda_zip
+  run:
+    name: Retrieve zipped lambda from container
+    command: |
+      docker cp $(docker ps -aq --filter 'label=nyulibraries.app=cors-proxy'):/app/dist .
+
+terraform_deploy: &terraform_deploy
+  run:
+    name: Deploy the Lambda to AWS via Terraform
+    command: |
+      apk add gettext
+      export TF_VAR_lambda_version=${CIRCLE_SHA1}
+      export TF_VAR_environment_variables=$(envsubst < .tf_env_vars)
+      docker-compose run terraform_deploy
+
+version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@1.0.11
 jobs:
-  deploy-staging-awsdev:
+  build-lambda:
     <<: *docker-defaults
     steps:
-      - <<: *check-awsdev-not-disabled
       - checkout
-      - setup_remote_docker
-      - <<: *auth_quay
-      - <<: *pull
+      - setup_remote_docker:
+          version: 19.03.13
       - <<: *build
-      - <<: *push
-      - <<: *set-env-stage-dev
-      - <<: *aws-deploy
+      - <<: *zip
+      - <<: *get_lambda_zip
+      - <<: *s3_deploy
+
+  deploy-lambda:
+    <<: *docker-defaults
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+      - <<: *terraform_deploy
+
+  # deploy-staging-awsdev:
+  #   <<: *docker-defaults
+  #   steps:
+  #     - <<: *check-awsdev-not-disabled
+  #     - checkout
+  #     - setup_remote_docker
+  #     - <<: *auth_quay
+  #     - <<: *pull
+  #     - <<: *build
+  #     - <<: *push
+  #     - <<: *set-env-stage-dev
+  #     - <<: *aws-deploy
 
   deploy-staging-awsprod:
     <<: *docker-defaults
     steps:
-      - <<: *check-awsprod-not-disabled
+      # - <<: *check-awsprod-not-disabled
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - <<: *auth_quay
       - <<: *pull
       - <<: *build
@@ -99,25 +150,26 @@ jobs:
       - <<: *set-env-stage-dev
       - <<: *aws-deploy
 
-  deploy-production-awsdev:
-    <<: *docker-defaults
-    steps:
-      - <<: *check-awsdev-not-disabled
-      - checkout
-      - setup_remote_docker
-      - <<: *auth_quay
-      - <<: *pull
-      - <<: *build
-      - <<: *push
-      - <<: *set-env-stage-prod
-      - <<: *aws-deploy
+  # deploy-production-awsdev:
+  #   <<: *docker-defaults
+  #   steps:
+  #     - <<: *check-awsdev-not-disabled
+  #     - checkout
+  #     - setup_remote_docker
+  #     - <<: *auth_quay
+  #     - <<: *pull
+  #     - <<: *build
+  #     - <<: *push
+  #     - <<: *set-env-stage-prod
+  #     - <<: *aws-deploy
 
   deploy-production-awsprod:
     <<: *docker-defaults
     steps:
-      - <<: *check-awsprod-not-disabled
+      # - <<: *check-awsprod-not-disabled
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - <<: *auth_quay
       - <<: *pull
       - <<: *build
@@ -129,7 +181,8 @@ jobs:
     <<: *docker-defaults
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - <<: *auth_quay
       - <<: *pull
       - <<: *build
@@ -141,13 +194,45 @@ workflows:
   build-test-and-deploy:
     jobs:
       - test
-      - deploy-staging-awsdev:
-          context: web-lambdas-aws-nyulitsdev
+      - build-lambda:
+          name: build-lambda-dev
+          context: web-lambdas-api-gateway-dev
           filters:
             branches:
               ignore: master
           requires:
             - test
+      - deploy-lambda:
+          name: deploy-lambda-dev
+          context: web-lambdas-api-gateway-dev
+          filters:
+            branches:
+              ignore: master
+          requires:
+            - build-lambda-dev
+      - build-lambda:
+          name: build-lambda-prod
+          context: web-lambdas-api-gateway-prod
+          filters:
+            branches:
+              ignore: master
+          requires:
+            - test
+      - deploy-lambda:
+          name: deploy-lambda-prod
+          context: web-lambdas-api-gateway-prod
+          filters:
+            branches:
+              only: master
+          requires:
+            - build-lambda-prod
+      # - deploy-staging-awsdev:
+      #     context: web-lambdas-aws-nyulitsdev
+      #     filters:
+      #       branches:
+      #         ignore: master
+      #     requires:
+      #       - test
       - deploy-staging-awsprod:
           context: web-lambdas-aws-nyulits
           filters:
@@ -155,13 +240,13 @@ workflows:
               ignore: master
           requires:
             - test
-      - deploy-production-awsdev:
-          context: web-lambdas-aws-nyulitsdev
-          filters:
-            branches:
-              only: master
-          requires:
-            - test
+      # - deploy-production-awsdev:
+      #     context: web-lambdas-aws-nyulitsdev
+      #     filters:
+      #       branches:
+      #         only: master
+      #     requires:
+      #       - test
       - deploy-production-awsprod:
           context: web-lambdas-aws-nyulits
           filters:
