@@ -1,5 +1,6 @@
 # cors-proxy
 
+[![Web Services](https://img.shields.io/badge/Owner-LITS%20Web%20Services-Black.svg)](https://shields.io/) 
 [![Docker Repository on Quay](https://quay.io/repository/nyulibraries/cors-proxy/status "Docker Repository on Quay")](https://quay.io/repository/nyulibraries/cors-proxy)
 [![CircleCI](https://circleci.com/gh/NYULibraries/cors-proxy.svg?style=shield)](https://circleci.com/gh/NYULibraries/cors-proxy)
 
