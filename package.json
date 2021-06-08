@@ -21,15 +21,13 @@
   "scripts": {
     "test-and-report": "yarn test && yarn coverage",
     "coverage": "nyc report --reporter=text-lcov | yarn coveralls",
-    "test": "yarn nyc jasmine",
-    "deploy": "yarn serverless deploy"
+    "test": "yarn nyc jasmine"
   },
   "devDependencies": {
     "coveralls": "^3.0.3",
     "jasmine": "^3.4.0",
     "jasmine-spec-reporter": "^4.2.1",
-    "nyc": "^14.1.1",
-    "serverless": "^1.43.0"
+    "nyc": "^14.1.1"
   },
   "dependencies": {
     "axios": "^0.21.1",
