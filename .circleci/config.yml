@@ -80,7 +80,8 @@ jobs:
     <<: *docker-defaults
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.7
       - install_awscli
       - clear_old_builds
 
@@ -88,7 +89,8 @@ jobs:
     <<: *docker-defaults
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.7
       - build
       - zip
       - get_lambda_zip
@@ -98,7 +100,8 @@ jobs:
     <<: *docker-defaults
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.7
       - terraform_deploy
 
   test:
