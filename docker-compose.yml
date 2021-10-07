@@ -1,6 +1,6 @@
 version: '3.7'
 
-x-deploy-environment: &x-deploy-environment
+x-environment: &x-environment
   BACKEND_BUCKET: 
   BACKEND_REGION: 
   BACKEND_DYNAMODB_TABLE: 
@@ -30,8 +30,8 @@ services:
     command: yarn test-and-report
     environment:
       COVERALLS_REPO_TOKEN: 
-    volumes:
-      - .:/app
+    # volumes:
+    #   - .:/app
 
   fn_create:
     image: cors-proxy-create
