@@ -1,6 +1,6 @@
 version: '3.7'
 
-x-deploy-environment: &x-deploy-environment
+x-environment: &x-environment
   BACKEND_BUCKET: 
   BACKEND_REGION: 
   BACKEND_DYNAMODB_TABLE: 
@@ -16,41 +16,46 @@ x-deploy-environment: &x-deploy-environment
   TF_VAR_apigw_stage:
   TF_VAR_lambda_version:
   TF_VAR_environment_variables:
+  ALLOW_ORIGINS:
 
 services:
   test:
     image: cors-proxy
     build:
       context: .
+      dockerfile: Dockerfile.node
       cache_from:
         - cors-proxy
-        - $IMAGES_DOMAIN/cors-proxy
+        - quay.io/nyulibraries/cors-proxy
     command: yarn test-and-report
     environment:
-      COVERALLS_REPO_TOKEN:
+      COVERALLS_REPO_TOKEN: 
     # volumes:
     #   - .:/app
 
-  terraform_deploy:
+  fn_create:
+    image: cors-proxy-create
     build:
-      context: deploy/
-    command: ["terraform", "apply", "-auto-approve"]
-    # env_file: dev.env
+      context: .
+      dockerfile: Dockerfile.deploy
     environment:
-      <<: *x-deploy-environment
-      BACKEND_KEY: lambdas/tf_state/cors-proxy
-      TF_VAR_lambda_function_name: cors-proxy
-      TF_VAR_lambda_description: "Cors-proxy has an approved list of domains that it can proxy URLs from, mainly used for loading RSS feeds and the like."
-      TF_VAR_lambda_handler: handler.corsProxy
-      TF_VAR_lambda_runtime: nodejs12.x
-      TF_VAR_lambda_method: GET
-      TF_VAR_lambda_memory_limit: 1024
+      <<: *x-environment
+    entrypoint: ["./create.sh"]
+  
+  fn_destroy:
+    image: cors-proxy-destroy
+    build:
+      context: .
+      dockerfile: Dockerfile.deploy
+    environment:
+      <<: *x-environment
+    entrypoint: ["./destroy.sh"]
 
   build_lambda:
     image: cors-proxy-build
     build: 
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.node
       args:
         production: "true"
     command: sh -c 'mkdir dist; cat .lambdafiles | xargs zip -r -9 -q ./dist/cors-proxy.zip'
