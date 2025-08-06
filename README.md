@@ -19,6 +19,13 @@ Simply configure allowed  via the environment. '*' is used as a wildcard. Uses a
 
 For our purposes, the url is checked in to our repository; for those interested in forking, you can also refer to an environment variable which is referenced at the time of build and deploy.
 
-Thanks:
+# CircleCI deployment disabled
+
+CircleCI deployment is currently broken and has been disabled for the time being.
+See 
+[Update Lambda CORS Proxy](https://nyu-lib.monday.com/boards/600228444/pulses/9546004582)
+for details.
+
+# Thanks
 * [Glifery/cors-proxy](https://github.com/Glifery/cors-proxy)
 * [SO * wildcard RegExp](https://stackoverflow.com/a/32402438/8603212)
