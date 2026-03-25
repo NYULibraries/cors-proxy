@@ -19,13 +19,16 @@ describe('corsProxy', () => {
     ['content-type']: 'json',
   };
 
-  let axios;
+  let fetchSpy;
   beforeEach(() => {
-    axios = require('axios');
-    spyOn(axios, 'get').and.returnValue(Promise.resolve({
-      data,
+    const response = {
+      text: function() {
+        return data;
+      },
       headers,
-    }));
+    };
+    fetchSpy = jasmine.createSpy('fetch')
+        .and.returnValue(Promise.resolve(response));
   });
 
   describe('with valid origins', () => {
@@ -38,7 +41,7 @@ describe('corsProxy', () => {
 
     describe('with url defined in query string', () => {
       it('redirects with allowed origin header', async () => {
-        const result = await corsProxy(event);
+        const result = await corsProxy(event, fetchSpy);
 
         expect(result).toEqual({
           statusCode: 200,
@@ -62,7 +65,7 @@ describe('corsProxy', () => {
       });
 
       it('returns a 422 error', async () => {
-        const result = await corsProxy(event);
+        const result = await corsProxy(event, fetchSpy);
         expect(result.statusCode).toEqual(422);
       });
 
@@ -74,21 +77,23 @@ describe('corsProxy', () => {
 
     describe('if the request rejects', () => {
       beforeEach(() => {
-        axios.get.and.returnValue(Promise.reject({
-          data: 'Error!',
-        }));
+        fetchSpy = jasmine.createSpy('fetch').and.returnValue(
+            Promise.reject({
+              data: 'Error!',
+            })
+        );
 
         spyOn(console, 'error');
       });
 
       it('returns a 422 error', async () => {
-        const result = await corsProxy(event);
+        const result = await corsProxy(event, fetchSpy);
 
         expect(result.statusCode).toEqual(422);
       });
 
       it('logs the error', async () => {
-        await corsProxy(event);
+        await corsProxy(event, fetchSpy);
         expect(console.error).toHaveBeenCalled();
       });
     });
@@ -103,7 +108,7 @@ describe('corsProxy', () => {
     });
 
     it('returns null allow origin', async () => {
-      const result = await corsProxy(event);
+      const result = await corsProxy(event, fetchSpy);
       expect(result.headers["Access-Control-Allow-Origin"]).toBe('null');
     });
   });
