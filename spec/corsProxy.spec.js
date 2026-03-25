@@ -1,5 +1,6 @@
 const handler = require('../handler');
 const corsProxy = handler.corsProxy;
+const emptyLambdaContext = {};
 
 describe('corsProxy', () => {
   const baseEvent = Object.freeze({
@@ -41,7 +42,7 @@ describe('corsProxy', () => {
 
     describe('with url defined in query string', () => {
       it('redirects with allowed origin header', async () => {
-        const result = await corsProxy(event, fetchSpy);
+        const result = await corsProxy(event, emptyLambdaContext, fetchSpy);
 
         expect(result).toEqual({
           statusCode: 200,
@@ -65,7 +66,7 @@ describe('corsProxy', () => {
       });
 
       it('returns a 422 error', async () => {
-        const result = await corsProxy(event, fetchSpy);
+        const result = await corsProxy(event, emptyLambdaContext, fetchSpy);
         expect(result.statusCode).toEqual(422);
       });
 
@@ -87,13 +88,13 @@ describe('corsProxy', () => {
       });
 
       it('returns a 422 error', async () => {
-        const result = await corsProxy(event, fetchSpy);
+        const result = await corsProxy(event, emptyLambdaContext, fetchSpy);
 
         expect(result.statusCode).toEqual(422);
       });
 
       it('logs the error', async () => {
-        await corsProxy(event, fetchSpy);
+        await corsProxy(event, emptyLambdaContext, fetchSpy);
         expect(console.error).toHaveBeenCalled();
       });
     });
@@ -108,7 +109,7 @@ describe('corsProxy', () => {
     });
 
     it('returns null allow origin', async () => {
-      const result = await corsProxy(event, fetchSpy);
+      const result = await corsProxy(event, emptyLambdaContext, fetchSpy);
       expect(result.headers["Access-Control-Allow-Origin"]).toBe('null');
     });
   });

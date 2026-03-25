@@ -2,7 +2,7 @@
 
 const allowOriginFilter = require('./lib/utils').allowOriginFilter;
 
-module.exports.corsProxy = async (event, fetchArg) => {
+module.exports.corsProxy = async (event, context, fetchArg) => {
   const { ALLOW_ORIGINS } = process.env;
   // Silence eslint error for `fetch`
   // eslint-disable-next-line no-undef
