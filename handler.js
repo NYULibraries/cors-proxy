@@ -21,7 +21,7 @@ module.exports.corsProxy = async (event, context, fetchArg) => {
       headers: {
         "Access-Control-Allow-Origin": allowOriginFilter(origin, allowedOrigins), // Required for CORS support to work
         "Access-Control-Allow-Credentials": true, // Required for cookies, authorization headers with HTTPS
-        "content-type": response.headers['content-type']
+        "content-type": response.headers.get('content-type'),
       }
     };
   } catch(err) {
