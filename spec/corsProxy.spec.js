@@ -26,7 +26,11 @@ describe('corsProxy', () => {
       text: function() {
         return data;
       },
-      headers,
+      headers: {
+        get: function(header) {
+          return headers[header];
+        }
+      }
     };
     fetchSpy = jasmine.createSpy('fetch')
         .and.returnValue(Promise.resolve(response));
