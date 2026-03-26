@@ -1,0 +1,8 @@
+cors-proxy:
+  BACKEND_KEY: lambdas/tf_state/cors-proxy
+  TF_VAR_lambda_function_name: cors-proxy
+  TF_VAR_lambda_description: "Cors-proxy has an approved list of domains that it can proxy URLs from, mainly used for loading RSS feeds and the like."
+  TF_VAR_lambda_handler: handler.corsProxy
+  TF_VAR_lambda_runtime: nodejs14.x
+  TF_VAR_lambda_method: GET
+  TF_VAR_lambda_memory_limit: 1024

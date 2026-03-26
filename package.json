@@ -33,9 +33,6 @@
     "axios": "^0.21.2",
     "kind-of": "^6.0.3"
   },
-  "engines": {
-    "node": "^12"
-  },
   "optionalDependencies": {
     "eslint": "^5.16.0"
   },
