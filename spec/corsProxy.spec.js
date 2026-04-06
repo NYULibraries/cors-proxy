@@ -6,11 +6,9 @@ describe('corsProxy', () => {
   const baseEvent = Object.freeze({
     queryStringParameters: {},
     headers: {
-      origin: 'library.nyu.edu'
+      origin: 'https://library.nyu.edu'
     }
   });
-
-  const event = Object.assign({}, baseEvent);
 
   const data = ({
     message:'Hello world',
@@ -37,22 +35,44 @@ describe('corsProxy', () => {
   });
 
   describe('with valid origins', () => {
-    beforeEach(() => {
-      const loadEnv = require('./helpers/loadEnv');
-      loadEnv({
-        'ALLOW_ORIGINS': 'library.nyu.edu,*.library.nyu.edu',
-      });
-    });
-
     describe('with url defined in query string', () => {
-      it('redirects with allowed origin header', async () => {
+      const devOrigin = 'https://dev.library.nyu.edu';
+      const prodOrigin = 'https://library.nyu.edu';
+
+      it( `Origin: ${ devOrigin }`, async () => {
+        const event = Object.assign( {}, baseEvent, {
+          headers: {
+            origin: devOrigin,
+          }
+        });
+
         const result = await corsProxy(event, emptyLambdaContext, fetchSpy);
 
         expect(result).toEqual({
           statusCode: 200,
           body: data,
           headers: {
-            "Access-Control-Allow-Origin": 'library.nyu.edu',
+            "Access-Control-Allow-Origin": devOrigin,
+            "Access-Control-Allow-Credentials": true,
+            "content-type": headers["content-type"]
+          }
+        });
+      });
+
+      it( `Origin: ${ prodOrigin }`, async () => {
+        const event = Object.assign( {}, baseEvent, {
+          headers: {
+            origin: prodOrigin,
+          }
+        });
+
+        const result = await corsProxy(event, emptyLambdaContext, fetchSpy);
+
+        expect(result).toEqual({
+          statusCode: 200,
+          body: data,
+          headers: {
+            "Access-Control-Allow-Origin": prodOrigin,
             "Access-Control-Allow-Credentials": true,
             "content-type": headers["content-type"]
           }
@@ -61,7 +81,7 @@ describe('corsProxy', () => {
     });
 
     describe('without a url defined in the query string', () => {
-      const event = Object.assign({}, baseEvent, {
+      const badEvent = Object.assign( {}, baseEvent, {
         queryStringParameters: undefined,
       });
 
@@ -70,17 +90,23 @@ describe('corsProxy', () => {
       });
 
       it('returns a 422 error', async () => {
-        const result = await corsProxy(event, emptyLambdaContext, fetchSpy);
+        const result = await corsProxy(badEvent, emptyLambdaContext, fetchSpy);
         expect(result.statusCode).toEqual(422);
       });
 
       it('logs the error', async () => {
-        await corsProxy(event);
+        await corsProxy(badEvent);
         expect(console.error).toHaveBeenCalled();
       });
     });
 
     describe('if the request rejects', () => {
+      const event = Object.assign( {}, baseEvent, {
+        headers: {
+          origin: 'https://does-not-matter.com',
+        }
+      });
+
       beforeEach(() => {
         fetchSpy = jasmine.createSpy('fetch').and.returnValue(
             Promise.reject({
@@ -98,23 +124,21 @@ describe('corsProxy', () => {
       });
 
       it('logs the error', async () => {
-        await corsProxy(event, emptyLambdaContext, fetchSpy);
+        await corsProxy( event, emptyLambdaContext, fetchSpy);
         expect(console.error).toHaveBeenCalled();
       });
     });
   });
 
   describe('with invalid origins', () => {
-    beforeEach(() => {
-      const loadEnv = require('./helpers/loadEnv');
-      loadEnv({
-        'ALLOW_ORIGINS': 'library.edu,*.library.edu',
+    it('returns `undefined` allow origin', async () => {
+      const event = Object.assign({}, baseEvent, {
+        headers: {
+          origin: 'https://invalid-origin.com'
+        },
       });
-    });
-
-    it('returns null allow origin', async () => {
       const result = await corsProxy(event, emptyLambdaContext, fetchSpy);
-      expect(result.headers["Access-Control-Allow-Origin"]).toBe('null');
+      expect(result.headers["Access-Control-Allow-Origin"]).toBe(undefined);
     });
   });
 });
