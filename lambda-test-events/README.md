@@ -3,18 +3,18 @@
 These test events have been manually deployed to Lambda:
 
 * Name: "Blank resource URL"
-  * Source: _blank-resource-url.json_
+  * Source: _[blank-resource-url.json](blank-resource-url.json)_
   * Expected result: HTTP 422 error response with error details in the body.
 * Name: "Origin: https://dev.library.nyu.edu"
-  * Source: _dev.library.nyu.edu.json_
+  * Source: _[dev.library.nyu.edu.json](dev.library.nyu.edu.json)_
   * Expected result: HTTP 200 response with RSS data in the body and the expected 
     CORS HTTP headers which allow access to https://dev.library.nyu.edu.
 * Name: "Invalid Origin header"
-  * Source: _invalid-origin.json_
+  * Source: _[invalid-origin.json](invalid-origin.json)_
   * Expected result: HTTP 200 response with RSS data in the body but no CORS
     HTTP headers.
 * Name: "Origin: https://library.nyu.edu"
-  * Source: _library.nyu.edu.json_
+  * Source: _[library.nyu.edu.json](library.nyu.edu.json)_
   * Expected result: HTTP 200 response with RSS data in the body and the expected
     CORS HTTP headers which allow access to https://library.nyu.edu.
 
