@@ -22,7 +22,9 @@ This worked fine for getting the Jasmine tests to pass, but seemed to cause
 breakage when the handler actually ran in Lambda.  Removing the `fetchArg` DI
 allowed the handler to function normally.
 Since a false negative is worse than no tests at all, the Jasmine tests have been
-completely removed.
+completely removed.  The commit with the final version of the unit tests has
+been tagged:
+[jasmine-unit-tests](https://github.com/NYULibraries/cors-proxy/releases/tag/jasmine-unit-tests).
 
 We are currently using Lambda test events to check the correctness of the handler:
 [Testing Lambda functions in the console](https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html).
