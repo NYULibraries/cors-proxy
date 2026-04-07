@@ -66,11 +66,7 @@ function isAllowedOrigin( origin ) {
     );
 }
 
-module.exports.corsProxy = async ( event, context, fetchArg ) => {
-    // Silence eslint error for `fetch`
-    // eslint-disable-next-line no-undef
-    const fetchMethod = fetchArg || fetch;
-
+module.exports.corsProxy = async ( event, context) => {
     try {
         // The `event` arg is provided by the AWS Lambda environment.
         // See "Request payload format" in
@@ -81,7 +77,7 @@ module.exports.corsProxy = async ( event, context, fetchArg ) => {
         const { queryStringParameters : { url }, headers : { origin } } = event;
 
         // Proxy the request to the cross-origin resource and get the response body.
-        const response = await fetchMethod( decodeURIComponent( url ) );
+        const response = await fetch( decodeURIComponent( url ) );
         const responseBodyText = await response.text();
 
         // Build minimal HTTP headers that will be sent whether CORS is allowed or

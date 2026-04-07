@@ -1,23 +1,36 @@
 # cors-proxy
 
-[![Web Services](https://img.shields.io/badge/Owner-LITS%20Web%20Services-Black.svg)](https://shields.io/) 
-[![Docker Repository on Quay](https://quay.io/repository/nyulibraries/cors-proxy/status "Docker Repository on Quay")](https://quay.io/repository/nyulibraries/cors-proxy)
-[![CircleCI](https://circleci.com/gh/NYULibraries/cors-proxy.svg?style=shield)](https://circleci.com/gh/NYULibraries/cors-proxy)
+CORS proxy powered by AWS Lambda.
 
-CORS proxy with AWS Lambda.
+See [the extensive code comments in handler.js](handler.js).
 
-Produces an `"Access-Control-Allow-Origin"` header specific to your server with some basic configuration.
+# Tests
 
-# Configure
+After replacing `axios` with `fetch` the original Jasmine unit tests broke
+because it wasn't possible to turn the `fetch` global into a Jasmine spy.  There
+was an initial attempt to circumvent this by dependency injecting a spy into the
+handler:
 
-Simply configure allowed  via the environment. '*' is used as a wildcard. Uses a comma separted list for multiple urls.
-
-`.tf_env_vars`
-```json
-{"ALLOW_ORIGINS": "https://*.library.nyu.edu,https://library.nyu.edu"}
+```javascript
+module.exports.corsProxy = async ( event, context, fetchArg ) => {
+    // Silence eslint error for `fetch`
+    // eslint-disable-next-line no-undef
+    const fetchMethod = fetchArg || fetch;
 ```
 
-For our purposes, the url is checked in to our repository; for those interested in forking, you can also refer to an environment variable which is referenced at the time of build and deploy.
+This worked fine for getting the Jasmine tests to pass, but seemed to cause
+breakage when the handler actually ran in Lambda.  Removing the `fetchArg` DI
+allowed the handler to function normally.
+Since a false negative is worse than no tests at all, the Jasmine tests have been
+completely removed.
+
+We are currently using Lambda test events to check the correctness of the handler:
+[Testing Lambda functions in the console](https://docs.aws.amazon.com/lambda/latest/dg/testing-functions.html).
+See _lambda-test-events/_.
+
+A local test suite will need to use an HTTP server fake to stub out the proxied
+server used for the tests.  Ideally the handler itself would also be running
+inside an HTTP server to better simulate actual runtime conditions in Lambda.
 
 # CircleCI deployment disabled
 
@@ -28,4 +41,4 @@ for details.
 
 # Thanks
 * [Glifery/cors-proxy](https://github.com/Glifery/cors-proxy)
-* [SO * wildcard RegExp](https://stackoverflow.com/a/32402438/8603212)
+
