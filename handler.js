@@ -54,8 +54,12 @@
 // - Include a trailing comma to make editing easier.  See "Trailing commas":
 //       https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Trailing_commas
 const ALLOWED_ORIGINS_REGEXPS = [
-    // Matches "library.nyu.edu" and any its subdomains.
-    // Example matches: https://dev.library.nyu.edu, http://library.nyu.edu
+    // Matches "library.nyu.edu" and any 4th level subdomains, either HTTP or
+    // HTTPS.
+    // Example matches:
+    //    • https://dev.library.nyu.edu
+    //    • http://library.nyu.edu
+    //    • https://arbitrary-4th-level-subdomain.library.nyu.edu
     'https?://(?:[^.]+\\.)?library.nyu.edu',
 ];
 

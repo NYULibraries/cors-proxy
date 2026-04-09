@@ -2,6 +2,10 @@
 
 These test events have been manually deployed to Lambda:
 
+* Name: "Any future 4th level *.library.nyu.edu subdomain"
+  * Source: _[arbitrary-4th-level-subdomain.library.nyu.edu](arbitrary-4th-level-subdomain.library.nyu.edu.json)_
+  * Expected result: HTTP 200 response with RSS data in the body and the expected
+    CORS HTTP headers which allow access to https://arbitrary-4th-level-subdomain.library.nyu.edu
 * Name: "Blank resource URL"
   * Source: _[blank-resource-url.json](blank-resource-url.json)_
   * Expected result: HTTP 422 error response with error details in the body.
