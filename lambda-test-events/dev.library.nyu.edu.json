@@ -1,0 +1,8 @@
+{
+    "queryStringParameters": {
+        "url": "https%3A%2F%2Fguides.nyu.edu%2Frss%2Fblog.php"
+    },
+    "headers": {
+        "origin": "https://dev.library.nyu.edu"
+    }
+}
